@@ -94,4 +94,60 @@ In `package.json`, add:
 	}
 
 
+# Using `pre-commit` for a Django app
+
+#### 1. Install `pre-commit` Requirements.txt
+
+	pre-commit>=3.3.0
+	black==23.7.0
+	isort==5.12.0
+	flake8==6.0.0
+	flake8-django==0.1.0
+
+
+#### 2. Create `.pre-commit-config.yaml` in your project root
+
+	repos:
+	  - repo: https://github.com/psf/black
+	    rev: 23.7.0  # or latest stable version
+	    hooks:
+	      - id: black
+	        language_version: python3
+
+	  - repo: https://github.com/PyCQA/isort
+	    rev: 5.12.0
+	    hooks:
+	      - id: isort
+	        language_version: python3
+
+	  - repo: https://github.com/PyCQA/flake8
+	    rev: 6.0.0
+	    hooks:
+	      - id: flake8
+	        additional_dependencies: [flake8-django]
+	        language_version: python3
+
+#### 3. Install the Git hook scripts
+
+	pre-commit install
+	pre-commit run --all-files
+
+#### Embed this in you code
+At the bottom of `manage.py`, just before `main()` or anywhere after imports:
+
+	import subprocess
+	import sys
+
+	if len(sys.argv) > 1 and sys.argv[1] == "precommit":
+	    subprocess.run(["pre-commit", "run", "--all-files"], check=True)
+	    sys.exit(0)
+
+
+#### ### Final Setup Command Checklist
+
+	pip install -r requirements.txt         # install dev tools
+	pre-commit install                      # install the Git hook
+	pre-commit run --all-files              # (optional) fix all files now
+	python manage.py precommit             # run hooks manually later
+
 
